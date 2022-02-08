@@ -1,5 +1,5 @@
 """View module for handling requests about game types"""
-from django.http import HttpResponseServerError
+
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
@@ -37,26 +37,33 @@ class EventView(ViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        """Post requests"""
+        """Handle post requests to events"""
         gamer = Gamer.objects.get(user=request.auth.user)
-        game = Game.objects.get(pk=request.data['game'])
-
-        event = Event.objects.create(
-            game=game,
-            organizer=gamer,
-            description=request.data['description'],
-            date=request.data['date'],
-            time=request.data['time'],
-        )
-
-        serializer = EventSerializer(event)
+        serializer = EventCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(organizer=gamer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk):
+        """Update Event"""
+        event = Event.objects.get(pk=pk)
+        event.description = request.data['description']
+        event.time = request.data['time']
+        event.date = request.data['date']
+        event.game = Game.objects.get(pk=request.data['game'])
+        event.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class EventSerializer(serializers.ModelSerializer):
-    """JSON serializer for game types
+    """Serializer for events
     """
     class Meta:
         model = Event
         fields = '__all__'
         depth = 1
+
+class EventCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['description', 'date', 'time', 'game']

@@ -17,7 +17,7 @@ class GameView(ViewSet):
         """
         try:
             game = Game.objects.get(pk=pk)
-            serializer = GameSerializer(game)
+            serializer = UpdateGameSerializer(game)
             return Response(serializer.data)
         except Game.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
@@ -61,6 +61,18 @@ class GameView(ViewSet):
 
         # Returning the serialized data and 201 status code to the client
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, pk):
+        """PUT update"""
+        game = Game.objects.get(pk=pk)
+        game.title = request.data['title']
+        game.maker = request.data['maker']
+        game.number_of_players = request.data['number_of_players']
+        game.skill_level = request.data['skill_level']
+        game.game_type = GameType.objects.get(pk=request.data['game_type'])
+        game.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -70,3 +82,10 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = '__all__'
         depth = 1
+
+class UpdateGameSerializer(serializers.ModelSerializer):
+    """JSON serializer for game types
+    """
+    class Meta:
+        model = Game
+        fields = '__all__'
