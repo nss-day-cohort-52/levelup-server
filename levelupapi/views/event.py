@@ -46,13 +46,27 @@ class EventView(ViewSet):
 
     def update(self, request, pk):
         """Update Event"""
+        try:
+            event = Event.objects.get(pk=pk)
+            # event.description = request.data['description']
+            # event.time = request.data['time']
+            # event.date = request.data['date']
+            # event.game = Game.objects.get(pk=request.data['game'])
+            # event.save()
+            serializer = EventCreateSerializer(event, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        except Event.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, pk):
+        """Delete game"""
         event = Event.objects.get(pk=pk)
-        event.description = request.data['description']
-        event.time = request.data['time']
-        event.date = request.data['date']
-        event.game = Game.objects.get(pk=request.data['game'])
-        event.save()
+        event.delete()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 class EventSerializer(serializers.ModelSerializer):

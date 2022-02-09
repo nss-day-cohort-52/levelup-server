@@ -50,9 +50,9 @@ class GameView(ViewSet):
         game = Game.objects.create(
             game_type=game_type,
             title=request.data['title'],
-            maker = request.data['maker'],
-            number_of_players = request.data['number_of_players'],
-            skill_level = request.data['skill_level'],
+            maker=request.data['maker'],
+            number_of_players=request.data['number_of_players'],
+            skill_level=request.data['skill_level'],
             gamer=gamer
         )
 
@@ -61,7 +61,7 @@ class GameView(ViewSet):
 
         # Returning the serialized data and 201 status code to the client
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def update(self, request, pk):
         """PUT update"""
         game = Game.objects.get(pk=pk)
@@ -74,6 +74,14 @@ class GameView(ViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def destroy(self, request, pk):
+        """Delete game"""
+        game = Game.objects.get(pk=pk)
+        game.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class GameSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
@@ -82,6 +90,7 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = '__all__'
         depth = 1
+
 
 class UpdateGameSerializer(serializers.ModelSerializer):
     """JSON serializer for game types

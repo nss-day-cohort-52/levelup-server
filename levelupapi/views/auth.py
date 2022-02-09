@@ -1,4 +1,3 @@
-from lib2to3.pgen2 import token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -12,6 +11,7 @@ from levelupapi.models import Gamer
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_user(request):
+    """Login User"""
     username = request.data['username']
     password = request.data['password']
 
@@ -36,6 +36,7 @@ def login_user(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user(request):
+    """Register a new user"""
     new_user = User.objects.create_user(
         username=request.data['username'],
         password=request.data['password'],
