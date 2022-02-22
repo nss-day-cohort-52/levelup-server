@@ -39,7 +39,6 @@ class GameTests(APITestCase):
         self.game.skill_level = 5
         self.game.number_of_players = 4
         self.game.game_type_id = 1
-        self.game.description = "It's too late to apologize."
 
         # Save the Game to the testing database
         self.game.save()
